@@ -8,22 +8,19 @@
 body, html {
     width: 100%; 
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; /* Ngăn cuộn trang lung tung */
     font-family: 'Inter', -apple-system, sans-serif;
-    /* Nền hồng lúc đầu như thiết kế */
-    background-color: #FDBCCF; 
-    /* Hiệu ứng chuyển nền sang đen mượt mà */
-    transition: background-color 2.5s ease; 
-    /* Chữ màu trắng bình thường */
+    background-color: #FDBCCF; /* Nền hồng lúc đầu */
+    transition: background-color 2.5s ease; /* Chuyển nền mượt */
     color: white; 
 }
 
-/* Đổi sang nền đen khi gọi class này */
 body.black-bg {
-    background-color: #000000;
+    background-color: #020617; /* Đổi sang nền đen mượt mà */
 }
 
-/* Quản lý các giai đoạn (Phases) */
+/* ================= ĐIỀU KHIỂN CÁC GIAI ĐOẠN (PHASES) ================= */
+/* Ẩn tất cả các giai đoạn theo mặc định */
 .phase {
     position: absolute;
     top: 0; left: 0;
@@ -33,20 +30,24 @@ body.black-bg {
     justify-content: center;
     align-items: center;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none; /* Không cho click khi đang ẩn */
     transition: opacity 1.5s ease;
 }
+
+/* Chỉ hiện giai đoạn nào có class 'active' */
 .phase.active {
     opacity: 1;
     pointer-events: auto;
+    z-index: 10;
 }
 
-/* ================= GIAI ĐOẠN 1: ĐỒNG HỒ CUỘN ================= */
+/* ================= LỖI 2: ĐỒNG HỒ CUỘN (PHASE 1) ================= */
 .question-text {
     font-size: 2.2rem;
     margin-bottom: 30px;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
 .month-text {
@@ -54,11 +55,12 @@ body.black-bg {
     opacity: 0.8;
 }
 
+/* Khung cắt (mask) để giấu các số thừa */
 .date-roller {
     font-size: 5rem;
     font-weight: bold;
-    height: 1.2em;
-    overflow: hidden;
+    height: 1.2em; /* Chỉ hiện đúng 1 dòng */
+    overflow: hidden; /* Cắt bỏ các số tràn ra ngoài khung */
     position: relative;
     text-align: center;
     margin: 10px 0;
@@ -79,7 +81,6 @@ body.black-bg {
     transition: all 0.4s ease;
 }
 
-/* Trạng thái sáng lên của ngày 2/8 */
 .date-item.highlight {
     opacity: 1;
     transform: scale(1.3);
@@ -87,7 +88,7 @@ body.black-bg {
     text-shadow: 0 0 20px #fff, 0 0 40px #FFD700;
 }
 
-/* ================= GIAI ĐOẠN 2 & 3: MA TRẬN & CHỮ CHẤM TRÒN ================= */
+/* ================= LỖI 1: CHỮ BỊ LỆCH MÀU CAM (PHASE 2 & 3) ================= */
 #matrixCanvas {
     position: absolute;
     top: 0; left: 0;
@@ -97,33 +98,28 @@ body.black-bg {
     transition: opacity 2s ease;
 }
 
-#phase-3 { 
-    z-index: 2; 
-}
-
-/* Chữ to xếp từ chấm tròn */
-.dotted-text {
-    font-size: 8rem;
+/* Ghi đè mọi thuộc tính h1 từ file gym cũ */
+h1.dotted-text {
+    font-size: 7rem;
     font-weight: 900;
     text-align: center;
     line-height: 1.1;
+    background: none; /* Xóa nền cam gradient cũ */
     background-image: radial-gradient(circle, #f472b6 35%, transparent 40%);
     background-size: 20px 20px;
     -webkit-background-clip: text;
-    color: transparent;
+    -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 15px rgba(244, 114, 182, 0.4));
     letter-spacing: 5px;
+    margin: 0;
 }
 
-/* ================= GIAI ĐOẠN 4: DÂY ẢNH ================= */
-#phase-4 { 
-    z-index: 3; 
-}
-
+/* ================= LỖI 3: KHUNG ẢNH VÀ DÂY THỪNG (PHASE 4) ================= */
 .rope-container {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
+    pointer-events: none;
 }
 
 .rope-svg {
@@ -132,8 +128,8 @@ body.black-bg {
 
 .rope-path {
     fill: none;
-    stroke: #d1d5db; /* Màu dây thừng xám nhạt */
-    stroke-width: 4;
+    stroke: #f472b6;
+    stroke-width: 3;
     stroke-dasharray: 3000;
     stroke-dashoffset: 3000;
     animation: drawRope 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -143,22 +139,23 @@ body.black-bg {
     to { stroke-dashoffset: 0; }
 }
 
-/* Thiết kế khung ảnh Polaroid */
 .polaroid {
     position: absolute;
     background: white;
     padding: 12px 12px 50px 12px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.6);
     cursor: pointer;
-    transform: scale(0); /* Ẩn lúc đầu */
+    transform: scale(0); /* Ban đầu ẩn ảnh đi */
     transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
 }
 
 .polaroid img {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 2px;
+    background-color: #f3f4f6; /* Màu nền lót đề phòng ảnh chưa load kịp */
 }
 
 .polaroid span {
@@ -172,7 +169,6 @@ body.black-bg {
     font-weight: 700;
 }
 
-/* Hiệu ứng phóng to ảnh mượt mà */
 .polaroid.zoomed {
     position: fixed;
     top: 50% !important;
@@ -183,7 +179,6 @@ body.black-bg {
     transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Màn che mờ phía sau khi phóng to ảnh */
 .overlay {
     position: fixed; 
     top: 0; left: 0; 
@@ -194,6 +189,7 @@ body.black-bg {
     transition: opacity 0.4s ease; 
     z-index: 999;
 }
+
 .overlay.active { 
     opacity: 1; 
     pointer-events: auto; 
