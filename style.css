@@ -1,188 +1,200 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Tuyến</title>
-    
-    <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
+/* ================= CÀI ĐẶT CHUNG ================= */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
 
-    <div id="phase-1" class="phase active">
-        <h2 class="question-text">Hôm nay là ngày gì thế nhỉ ????</h2>
-        <p class="month-text">Tháng 7</p>
-        <div class="date-roller">
-            <div class="date-list" id="dateList">
-                </div>
-        </div>
-        <p class="month-text" style="margin-top:10px;">Tháng 8</p>
-    </div>
+body, html {
+    width: 100%; 
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, sans-serif;
+    /* Nền hồng lúc đầu như thiết kế */
+    background-color: #FDBCCF; 
+    /* Hiệu ứng chuyển nền sang đen mượt mà */
+    transition: background-color 2.5s ease; 
+    /* Chữ màu trắng bình thường */
+    color: white; 
+}
 
-    <canvas id="matrixCanvas"></canvas>
+/* Đổi sang nền đen khi gọi class này */
+body.black-bg {
+    background-color: #000000;
+}
 
-    <div id="phase-3" class="phase">
-        <h1 class="dotted-text">HAPPY<br>BIRTHDAY</h1>
-    </div>
+/* Quản lý các giai đoạn (Phases) */
+.phase {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.5s ease;
+}
+.phase.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 
-    <div id="phase-4" class="phase">
-        <div class="rope-container">
-            <svg class="rope-svg" preserveAspectRatio="none">
-                <path class="rope-path" d="M -100,150 Q 200,300 500,150 T 1000,250 T 1500,100"></path>
-            </svg>
-        </div>
-        
-        <div class="polaroid" style="top: 180px; left: 15%; transform: rotate(-10deg);">
-            <img src="tuyen1.jpg" alt="Tuyến">
-            <span>Love Day 🌹</span>
-        </div>
-        <div class="polaroid" style="top: 200px; left: 45%; transform: rotate(8deg);">
-            <img src="tuyen2.jpg" alt="Tuyến">
-            <span>Cu Te Nhất</span>
-        </div>
-        <div class="polaroid" style="top: 150px; left: 75%; transform: rotate(-5deg);">
-            <img src="tuyen3.jpg" alt="Tuyến">
-            <span>2/8/2009</span>
-        </div>
-    </div>
+/* ================= GIAI ĐOẠN 1: ĐỒNG HỒ CUỘN ================= */
+.question-text {
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
 
-    <div class="overlay" id="overlay"></div>
+.month-text {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
 
-    <script>
-        // 1. Khởi tạo Đồng hồ cuộn
-        const dates = [25, 26, 27, 28, 29, 30, 31, 1, 2];
-        const dateList = document.getElementById('dateList');
-        dates.forEach(d => {
-            let div = document.createElement('div');
-            div.className = 'date-item';
-            div.innerText = d;
-            dateList.appendChild(div);
-        });
+.date-roller {
+    font-size: 5rem;
+    font-weight: bold;
+    height: 1.2em;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+    margin: 10px 0;
+}
 
-        // Bắt đầu chạy Animation sau khi trang load
-        setTimeout(() => {
-            const itemHeight = document.querySelector('.date-item').offsetHeight;
-            const targetScroll = -itemHeight * (dates.length - 1);
-            
-            // Cuộn đến ngày 2 trong vòng 5 giây
-            dateList.style.transition = "top 5s cubic-bezier(0.25, 1, 0.5, 1)";
-            dateList.style.top = targetScroll + 'px';
+.date-list {
+    position: relative;
+    top: 0;
+}
 
-            // Sau 5s (khi cuộn xong), làm sáng số 2 và bắn kim tuyến
-            setTimeout(() => {
-                const items = document.querySelectorAll('.date-item');
-                items[items.length - 1].classList.add('highlight');
-                
-                // Bắn kim tuyến
-                confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+.date-item {
+    height: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transform: scale(0.8);
+    transition: all 0.4s ease;
+}
 
-                // Sau 2s nữa, chuyển sang Giai đoạn Ma Trận
-                setTimeout(startPhase2, 2000);
-            }, 5000); // Khớp với 5s cuộn
-        }, 500);
+/* Trạng thái sáng lên của ngày 2/8 */
+.date-item.highlight {
+    opacity: 1;
+    transform: scale(1.3);
+    color: #fff;
+    text-shadow: 0 0 20px #fff, 0 0 40px #FFD700;
+}
 
-        // 2. Giai đoạn Ma trận & Đổi nền
-        function startPhase2() {
-            document.getElementById('phase-1').classList.remove('active');
-            document.body.classList.add('black-bg'); // Đổi nền đen
-            
-            const matrix = document.getElementById('matrixCanvas');
-            matrix.style.opacity = 1;
-            initMatrix(); // Bắt đầu mưa ma trận
+/* ================= GIAI ĐOẠN 2 & 3: MA TRẬN & CHỮ CHẤM TRÒN ================= */
+#matrixCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 2s ease;
+}
 
-            // Sau 5s ma trận, hiện chữ HAPPY BIRTHDAY to
-            setTimeout(startPhase3, 5000);
-        }
+#phase-3 { 
+    z-index: 2; 
+}
 
-        // 3. Giai đoạn Chữ Chấm tròn
-        function startPhase3() {
-            const phase3 = document.getElementById('phase-3');
-            phase3.classList.add('active');
+/* Chữ to xếp từ chấm tròn */
+.dotted-text {
+    font-size: 8rem;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.1;
+    background-image: radial-gradient(circle, #f472b6 35%, transparent 40%);
+    background-size: 20px 20px;
+    -webkit-background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 15px rgba(244, 114, 182, 0.4));
+    letter-spacing: 5px;
+}
 
-            // Sau 5s, mờ chữ đi và vẽ dây thừng
-            setTimeout(() => {
-                phase3.classList.remove('active');
-                setTimeout(startPhase4, 1500); // Đợi chữ mờ hẳn rồi qua Phase 4
-            }, 5000);
-        }
+/* ================= GIAI ĐOẠN 4: DÂY ẢNH ================= */
+#phase-4 { 
+    z-index: 3; 
+}
 
-        // 4. Giai đoạn Dây ảnh
-        function startPhase4() {
-            // Mờ dần ma trận để làm nổi bật dây ảnh
-            document.getElementById('matrixCanvas').style.opacity = 0.2; 
-            document.getElementById('phase-4').classList.add('active');
+.rope-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
 
-            // Hiện từng ảnh lên với hiệu ứng pop-up
-            const photos = document.querySelectorAll('.polaroid');
-            photos.forEach((photo, index) => {
-                setTimeout(() => {
-                    const currentRotation = photo.style.transform.match(/rotate\((.*?)\)/)[0];
-                    photo.style.transform = `scale(1) ${currentRotation}`;
-                }, 1500 + (index * 600)); // Vẽ dây xong mới hiện ảnh dần dần
-            });
-        }
+.rope-svg {
+    width: 100%; height: 100%;
+}
 
-        /* MATRIX RAIN LOGIC */
-        function initMatrix() {
-            const canvas = document.getElementById('matrixCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+.rope-path {
+    fill: none;
+    stroke: #d1d5db; /* Màu dây thừng xám nhạt */
+    stroke-width: 4;
+    stroke-dasharray: 3000;
+    stroke-dashoffset: 3000;
+    animation: drawRope 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
-            // Các từ khóa theo yêu cầu
-            const words = ["HAPPPPBIRTHDAY", "KIM TUYEN CU TE", "NHKT", "FROM VCM WITH LOVE"];
-            const fontSize = 16;
-            const columns = canvas.width / fontSize;
-            const drops = [];
-            
-            for(let x = 0; x < columns; x++) drops[x] = 1; 
+@keyframes drawRope {
+    to { stroke-dashoffset: 0; }
+}
 
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = '#f472b6'; // Màu hồng
-                ctx.font = fontSize + 'px monospace';
+/* Thiết kế khung ảnh Polaroid */
+.polaroid {
+    position: absolute;
+    background: white;
+    padding: 12px 12px 50px 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    cursor: pointer;
+    transform: scale(0); /* Ẩn lúc đầu */
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
-                for(let i = 0; i < drops.length; i++) {
-                    const randomWord = words[Math.floor(Math.random() * words.length)];
-                    const text = randomWord.charAt(Math.floor(Math.random() * randomWord.length));
-                    
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    
-                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-                        drops[i] = 0;
-                    drops[i]++;
-                }
-            }
-            setInterval(draw, 50);
-        }
+.polaroid img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+}
 
-        /* LOGIC PHÓNG TO ẢNH MƯỢT MÀ */
-        const photos = document.querySelectorAll('.polaroid');
-        const overlay = document.getElementById('overlay');
+.polaroid span {
+    position: absolute;
+    bottom: 15px;
+    left: 0; 
+    width: 100%;
+    text-align: center;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
 
-        photos.forEach(photo => {
-            photo.addEventListener('click', function() {
-                if(this.classList.contains('zoomed')) {
-                    this.classList.remove('zoomed');
-                    overlay.classList.remove('active');
-                } else {
-                    photos.forEach(p => p.classList.remove('zoomed')); // Tắt ảnh khác
-                    this.classList.add('zoomed');
-                    overlay.classList.add('active');
-                }
-            });
-        });
+/* Hiệu ứng phóng to ảnh mượt mà */
+.polaroid.zoomed {
+    position: fixed;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(2) rotate(0deg) !important;
+    z-index: 1000;
+    box-shadow: 0 0 100px rgba(0,0,0,0.9);
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
 
-        overlay.addEventListener('click', () => {
-            photos.forEach(p => p.classList.remove('zoomed'));
-            overlay.classList.remove('active');
-        });
-    </script>
-</body>
-</html>
+/* Màn che mờ phía sau khi phóng to ảnh */
+.overlay {
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.4s ease; 
+    z-index: 999;
+}
+.overlay.active { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
