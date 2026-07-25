@@ -3,60 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Tuyến</title>
+    <!-- Tải thư viện Canvas Confetti để làm hiệu ứng kim tuyến -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* ================= CÀI ĐẶT CHUNG ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #FDBCCF; /* Nền hồng lúc đầu */
+            transition: background-color 2s ease; /* Hiệu ứng chuyển nền sang đen */
+            color: white;
+        }
 
-    <title>GYM SPACE | Bắt đầu tập luyện</title>
+        .phase {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        .phase.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    <link rel="stylesheet" href="style.css">
+        /* ================= GIAI ĐOẠN 1: ĐỒNG HỒ CUỘN ================= */
+        #phase-1 h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .date-roller {
+            font-size: 4rem;
+            font-weight: bold;
+            height: 1.2em;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+        }
+        .date-list {
+            position: relative;
+            top: 0;
+            transition: top 4s cubic-bezier(0.25, 1, 0.5, 1); /* Cuộn mượt và dừng lại */
+        }
+        .date-item {
+            height: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+            transform: scale(0.8);
+            transition: all 0.3s;
+        }
+        .date-item.highlight {
+            opacity: 1;
+            transform: scale(1.2);
+            color: #fff;
+            text-shadow: 0 0 20px #fff, 0 0 40px #FFD700;
+        }
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        /* ================= GIAI ĐOẠN 2 & 3: MA TRẬN & CHỮ CHẤM TRÒN ================= */
+        #matrixCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        
+        #phase-3 { z-index: 2; }
+        .dotted-text {
+            font-size: 6rem;
+            font-weight: 900;
+            text-align: center;
+            /* Tạo hiệu ứng chữ ghép từ các chấm tròn */
+            background-image: radial-gradient(circle, #f472b6 40%, transparent 40%);
+            background-size: 15px 15px;
+            -webkit-background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 10px rgba(244, 114, 182, 0.5));
+            letter-spacing: 5px;
+        }
+
+        /* ================= GIAI ĐOẠN 4: DÂY ẢNH ================= */
+        #phase-4 { z-index: 3; }
+        .rope-container {
+            position: absolute;
+            width: 100%; height: 100%;
+        }
+        .rope-svg {
+            width: 100%; height: 100%;
+        }
+        .rope-path {
+            fill: none;
+            stroke: #f472b6;
+            stroke-width: 3;
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: drawRope 3s forwards;
+            filter: drop-shadow(0 0 5px #f472b6);
+        }
+        @keyframes drawRope {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .polaroid {
+            position: absolute;
+            background: white;
+            padding: 10px 10px 40px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transform: scale(0);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .polaroid img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .polaroid span {
+            position: absolute;
+            bottom: 10px;
+            left: 0; width: 100%;
+            text-align: center;
+            color: black;
+            font-family: 'Inter', sans-serif;
+            font-weight: bold;
+        }
+        /* Hiệu ứng phóng to ảnh mượt mà */
+        .polaroid.zoomed {
+            position: fixed;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(2.5) rotate(0deg) !important;
+            z-index: 1000;
+            box-shadow: 0 0 100px rgba(0,0,0,0.9);
+        }
+        /* Màn che mờ khi phóng to ảnh */
+        .overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.8);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s; z-index: 999;
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
+
+    </style>
 </head>
-
 <body>
 
-    <div class="background-glow"></div>
-
-    <nav class="navbar">
-        <div class="logo">GYM SPACE</div>
-
-        <div class="nav-links">
-            <a href="#">Trang chủ</a>
-            <a href="#">Lịch tập</a>
-            <a href="#">Đăng nhập</a>
+    <!-- Giai đoạn 1: Đồng hồ cuộn -->
+    <div id="phase-1" class="phase active">
+        <h2>Hôm nay là ngày gì thế nhỉ ????</h2>
+        <p style="margin-bottom:10px;">Tháng 7</p>
+        <div class="date-roller">
+            <div class="date-list" id="dateList">
+                <!-- Sẽ được thêm bằng JS -->
+            </div>
         </div>
-    </nav>
-
-    <div class="container">
-
-        <div class="profile-glow"></div>
-
-        <h1>GYM SPACE</h1>
-
-        <p class="subtitle">
-            Bạn sẽ tập gì vào Hôm Nay?
-        </p>
-
-        <div class="spline-container">
-            <p>Mô hình 3D cơ thể người sẽ hiển thị ở đây<br><span>(Nhúng mã iframe của Spline vào thẻ div này)</span></p>
-        </div>
-
-        <div class="skills">
-            <span class="skill-tag">Cơ Ngực</span>
-            <span class="skill-tag">Lưng / Xô</span>
-            <span class="skill-tag">Cơ Vai</span>
-            <span class="skill-tag">Chân / Mông</span>
-        </div>
-
-        <div class="buttons">
-            <button class="primary-btn">Bắt đầu tập</button>
-            <button class="secondary-btn">Xem lịch tập</button>
-        </div>
-
-        <div class="footer">
-            © 2026 Văn Công Minh - Đam mê Fitness & Lập trình.
-        </div>
-
+        <p style="margin-top:10px;">Tháng 8</p>
     </div>
 
+    <!-- Ma trận Canvas (Giai đoạn 2) -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Giai đoạn 3: Chữ lớn Chấm tròn -->
+    <div id="phase-3" class="phase">
+        <h1 class="dotted-text">HAPPY<br>BIRTHDAY</h1>
+    </div>
+
+    <!-- Giai đoạn 4: Dây ảnh kỉ niệm -->
+    <div id="phase-4" class="phase">
+        <div class="rope-container">
+            <svg class="rope-svg" preserveAspectRatio="none">
+                <!-- Đường cong dây thừng -->
+                <path class="rope-path" d="M 0,200 Q 300,50 600,300 T 1200,100 T 1600,400"></path>
+            </svg>
+        </div>
+        <!-- Thêm các ảnh của Tuyến vào đây, thay đổi src="tuyen1.jpg" -->
+        <div class="polaroid" style="top: 150px; left: 15%; transform: rotate(-10deg);">
+            <img src="tuyen1.jpg" alt="Tuyến">
+            <span>Love Day 🌹</span>
+        </div>
+        <div class="polaroid" style="top: 250px; left: 40%; transform: rotate(5deg);">
+            <img src="tuyen2.jpg" alt="Tuyến">
+            <span>Cu Te Nhất</span>
+        </div>
+        <div class="polaroid" style="top: 120px; left: 70%; transform: rotate(-5deg);">
+            <img src="tuyen3.jpg" alt="Tuyến">
+            <span>2/8/2009</span>
+        </div>
+    </div>
+
+    <!-- Màn che khi zoom ảnh -->
+    <div class="overlay" id="overlay"></div>
+
+    <script>
+        /* ================= ĐIỀU PHỐI KỊCH BẢN (TIMELINE) ================= */
+        
+        // 1. Khởi tạo Đồng hồ cuộn
+        const dates = [25, 26, 27, 28, 29, 30, 31, 1, 2];
+        const dateList = document.getElementById('dateList');
+        dates.forEach(d => {
+            let div = document.createElement('div');
+            div.className = 'date-item';
+            div.innerText = d;
+            dateList.appendChild(div);
+        });
+
+        // Bắt đầu chạy Animation sau khi trang load 1 giây
+        setTimeout(() => {
+            // Tính toán khoảng cách cuộn đến số 2 (phần tử cuối cùng)
+            const itemHeight = document.querySelector('.date-item').offsetHeight;
+            const targetScroll = -itemHeight * (dates.length - 1);
+            dateList.style.top = targetScroll + 'px';
+
+            // Sau 4s (khi cuộn xong), làm sáng số 2 và bắn kim tuyến
+            setTimeout(() => {
+                const items = document.querySelectorAll('.date-item');
+                items[items.length - 1].classList.add('highlight');
+                
+                // Bắn kim tuyến (Confetti)
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+                // Sau 2s nữa, chuyển sang Giai đoạn Ma Trận
+                setTimeout(startPhase2, 2000);
+            }, 4000);
+        }, 1000);
+
+        // 2. Giai đoạn Ma trận & Đổi nền
+        function startPhase2() {
+            document.getElementById('phase-1').classList.remove('active');
+            document.body.style.backgroundColor = '#000000'; // Đổi nền đen
+            
+            const matrix = document.getElementById('matrixCanvas');
+            matrix.style.opacity = 1;
+            initMatrix(); // Bắt đầu mưa ma trận
+
+            // Sau 5s ma trận, hiện chữ HAPPY BIRTHDAY to
+            setTimeout(startPhase3, 5000);
+        }
+
+        // 3. Giai đoạn Chữ Chấm tròn
+        function startPhase3() {
+            const phase3 = document.getElementById('phase-3');
+            phase3.classList.add('active');
+
+            // Sau 5s, mờ chữ đi và vẽ dây thừng
+            setTimeout(() => {
+                phase3.classList.remove('active');
+                setTimeout(startPhase4, 1000); // Đợi chữ mờ hẳn rồi qua Phase 4
+            }, 5000);
+        }
+
+        // 4. Giai đoạn Dây ảnh
+        function startPhase4() {
+            // Mờ dần ma trận để làm nổi bật dây ảnh
+            document.getElementById('matrixCanvas').style.opacity = 0.3; 
+            document.getElementById('phase-4').classList.add('active');
+
+            // Hiện từng ảnh lên với hiệu ứng pop-up
+            const photos = document.querySelectorAll('.polaroid');
+            photos.forEach((photo, index) => {
+                setTimeout(() => {
+                    const currentRotation = photo.style.transform.match(/rotate\((.*?)\)/)[0];
+                    photo.style.transform = `scale(1) ${currentRotation}`;
+                }, 1000 + (index * 500)); // Vẽ dây 1s xong mới hiện ảnh dần dần
+            });
+        }
+
+        /* ================= CODE HIỆU ỨNG MA TRẬN ================= */
+        function initMatrix() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // Mảng các chuỗi theo yêu cầu của ông
+            const words = ["HAPPPPBIRTHDAY", "KIM TUYEN CU TE", "NHKT", "FROM VCM WITH LOVE"];
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+            
+            for(let x = 0; x < columns; x++) drops[x] = 1; 
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#f472b6'; // Chữ ma trận màu hồng
+                ctx.font = fontSize + 'px monospace';
+
+                for(let i = 0; i < drops.length; i++) {
+                    // Lấy ngẫu nhiên 1 ký tự từ các chuỗi
+                    const randomWord = words[Math.floor(Math.random() * words.length)];
+                    const text = randomWord.charAt(Math.floor(Math.random() * randomWord.length));
+                    
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+                        drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 50);
+        }
+
+        /* ================= CODE PHÓNG TO ẢNH (LIGHTBOX) ================= */
+        const photos = document.querySelectorAll('.polaroid');
+        const overlay = document.getElementById('overlay');
+
+        photos.forEach(photo => {
+            photo.addEventListener('click', function() {
+                // Nếu đang zoom thì thu nhỏ lại
+                if(this.classList.contains('zoomed')) {
+                    this.classList.remove('zoomed');
+                    overlay.classList.remove('active');
+                } else {
+                    // Bỏ zoom các ảnh khác
+                    photos.forEach(p => p.classList.remove('zoomed'));
+                    // Zoom ảnh được click
+                    this.classList.add('zoomed');
+                    overlay.classList.add('active');
+                }
+            });
+        });
+
+        // Bấm ra ngoài (vùng đen) để đóng ảnh
+        overlay.addEventListener('click', () => {
+            photos.forEach(p => p.classList.remove('zoomed'));
+            overlay.classList.remove('active');
+        });
+
+    </script>
 </body>
 </html>
