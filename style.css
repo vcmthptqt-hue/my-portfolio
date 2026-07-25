@@ -8,19 +8,19 @@
 body, html {
     width: 100%; 
     height: 100%;
-    overflow: hidden; /* Ngăn cuộn trang lung tung */
+    overflow: hidden; 
     font-family: 'Inter', -apple-system, sans-serif;
-    background-color: #FDBCCF; /* Nền hồng lúc đầu */
-    transition: background-color 2.5s ease; /* Chuyển nền mượt */
+    background-color: #FDBCCF; /* Nền hồng nhẹ nhàng lúc mới vào */
+    transition: background-color 2.5s ease; /* Hiệu ứng tối dần sang đen */
     color: white; 
 }
 
+/* Đổi thành nền đen sâu thẳm lúc mưa ma trận rơi */
 body.black-bg {
-    background-color: #020617; /* Đổi sang nền đen mượt mà */
+    background-color: #020617; 
 }
 
-/* ================= ĐIỀU KHIỂN CÁC GIAI ĐOẠN (PHASES) ================= */
-/* Ẩn tất cả các giai đoạn theo mặc định */
+/* ================= TRẠNG THÁI ẨN/HIỆN CÁC GIAI ĐOẠN ================= */
 .phase {
     position: absolute;
     top: 0; left: 0;
@@ -30,18 +30,18 @@ body.black-bg {
     justify-content: center;
     align-items: center;
     opacity: 0;
-    pointer-events: none; /* Không cho click khi đang ẩn */
+    pointer-events: none;
     transition: opacity 1.5s ease;
 }
 
-/* Chỉ hiện giai đoạn nào có class 'active' */
+/* Các phase được gắn .active sẽ hiện lên mượt mà */
 .phase.active {
     opacity: 1;
     pointer-events: auto;
     z-index: 10;
 }
 
-/* ================= LỖI 2: ĐỒNG HỒ CUỘN (PHASE 1) ================= */
+/* ================= GIAI ĐOẠN 1: CUỘN NGÀY THÁNG ================= */
 .question-text {
     font-size: 2.2rem;
     margin-bottom: 30px;
@@ -55,12 +55,12 @@ body.black-bg {
     opacity: 0.8;
 }
 
-/* Khung cắt (mask) để giấu các số thừa */
+/* Slot Machine cắt khung chữ */
 .date-roller {
     font-size: 5rem;
     font-weight: bold;
-    height: 1.2em; /* Chỉ hiện đúng 1 dòng */
-    overflow: hidden; /* Cắt bỏ các số tràn ra ngoài khung */
+    height: 1.2em;
+    overflow: hidden; 
     position: relative;
     text-align: center;
     margin: 10px 0;
@@ -81,6 +81,7 @@ body.black-bg {
     transition: all 0.4s ease;
 }
 
+/* Trạng thái sáng chói lóa của ngày 2/8 */
 .date-item.highlight {
     opacity: 1;
     transform: scale(1.3);
@@ -88,7 +89,7 @@ body.black-bg {
     text-shadow: 0 0 20px #fff, 0 0 40px #FFD700;
 }
 
-/* ================= LỖI 1: CHỮ BỊ LỆCH MÀU CAM (PHASE 2 & 3) ================= */
+/* ================= GIAI ĐOẠN 2 & 3: MA TRẬN & CHỮ TO ================= */
 #matrixCanvas {
     position: absolute;
     top: 0; left: 0;
@@ -98,23 +99,42 @@ body.black-bg {
     transition: opacity 2s ease;
 }
 
-/* Ghi đè mọi thuộc tính h1 từ file gym cũ */
-h1.dotted-text {
-    font-size: 7rem;
-    font-weight: 900;
-    text-align: center;
-    line-height: 1.1;
-    background: none; /* Xóa nền cam gradient cũ */
-    background-image: radial-gradient(circle, #f472b6 35%, transparent 40%);
-    background-size: 20px 20px;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 15px rgba(244, 114, 182, 0.4));
-    letter-spacing: 5px;
-    margin: 0;
+#phase-3 { 
+    z-index: 2; 
 }
 
-/* ================= LỖI 3: KHUNG ẢNH VÀ DÂY THỪNG (PHASE 4) ================= */
+/* CHỮ HAPPY BIRTHDAY SIÊU TO, CHẤM DÀY */
+h1.dotted-text {
+    font-size: 11rem; /* Kích thước siêu lớn như yêu cầu */
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    
+    background: none;
+    /* Mật độ chấm tròn cực dày (12px) */
+    background-image: radial-gradient(circle, #f472b6 45%, transparent 50%);
+    background-size: 12px 12px;
+    
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.4));
+    letter-spacing: 8px;
+}
+
+/* Thu nhỏ lại chữ một chút trên màn hình điện thoại để không rớt dòng */
+@media (max-width: 768px) {
+    h1.dotted-text {
+        font-size: 5rem;
+        background-size: 8px 8px;
+    }
+}
+
+/* ================= GIAI ĐOẠN 4: ĐƯỜNG CONG VÀ ẢNH POLAROID ================= */
+#phase-4 { 
+    z-index: 3; 
+}
+
 .rope-container {
     position: absolute;
     top: 0; left: 0;
@@ -126,12 +146,17 @@ h1.dotted-text {
     width: 100%; height: 100%;
 }
 
+/* ĐƯỜNG CONG LƯỢN SÓNG TRẮNG SÁNG */
 .rope-path {
     fill: none;
-    stroke: #f472b6;
-    stroke-width: 3;
-    stroke-dasharray: 3000;
-    stroke-dashoffset: 3000;
+    stroke: #ffffff; /* Sợi dây trắng tinh khiết */
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6)); /* Hào quang phát sáng trắng */
+    
+    /* Animation tự vẽ dây từ trái qua phải */
+    stroke-dasharray: 4000;
+    stroke-dashoffset: 4000;
     animation: drawRope 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -139,13 +164,14 @@ h1.dotted-text {
     to { stroke-dashoffset: 0; }
 }
 
+/* CÁC BỨC ẢNH POLAROID */
 .polaroid {
     position: absolute;
     background: white;
     padding: 12px 12px 50px 12px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.6);
     cursor: pointer;
-    transform: scale(0); /* Ban đầu ẩn ảnh đi */
+    transform: scale(0); /* Bắt đầu với size 0 để nhúng lên dần dần */
     transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 5;
 }
@@ -155,7 +181,7 @@ h1.dotted-text {
     height: 180px;
     object-fit: cover;
     border-radius: 2px;
-    background-color: #f3f4f6; /* Màu nền lót đề phòng ảnh chưa load kịp */
+    background-color: #f3f4f6;
 }
 
 .polaroid span {
@@ -169,16 +195,18 @@ h1.dotted-text {
     font-weight: 700;
 }
 
+/* HIỆU ỨNG NHẤN VÀO LÀ PHÓNG TO ẢNH (ZOOM) */
 .polaroid.zoomed {
     position: fixed;
     top: 50% !important;
     left: 50% !important;
-    transform: translate(-50%, -50%) scale(2) rotate(0deg) !important;
+    transform: translate(-50%, -50%) scale(2.2) rotate(0deg) !important;
     z-index: 1000;
     box-shadow: 0 0 100px rgba(0,0,0,0.9);
     transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+/* MÀN CHE LÀM MỜ NỀN KHI ĐANG ZOOM ẢNH */
 .overlay {
     position: fixed; 
     top: 0; left: 0; 
