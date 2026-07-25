@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Tuyến</title>
+    <title>Happy Birthday Tuyến | 2/8/2009</title>
     
     <link rel="stylesheet" href="style.css">
     
@@ -31,20 +31,20 @@
 
     <div id="phase-4" class="phase">
         <div class="rope-container">
-            <svg class="rope-svg" preserveAspectRatio="none">
-                <path class="rope-path" d="M -100,150 Q 200,300 500,150 T 1000,250 T 1500,100"></path>
+            <svg class="rope-svg" preserveAspectRatio="none" viewBox="0 0 1000 500">
+                <path class="rope-path" d="M -100,250 C 200,50 350,450 650,250 S 900,50 1200,250"></path>
             </svg>
         </div>
         
-        <div class="polaroid" style="top: 180px; left: 15%; transform: rotate(-10deg);">
+        <div class="polaroid" style="top: 100px; left: 15%; transform: rotate(-10deg);">
             <img src="tuyen1.jpg" alt="Tuyến">
             <span>Love Day 🌹</span>
         </div>
-        <div class="polaroid" style="top: 200px; left: 45%; transform: rotate(8deg);">
+        <div class="polaroid" style="top: 250px; left: 45%; transform: rotate(8deg);">
             <img src="tuyen2.jpg" alt="Tuyến">
             <span>Cu Te Nhất</span>
         </div>
-        <div class="polaroid" style="top: 150px; left: 75%; transform: rotate(-5deg);">
+        <div class="polaroid" style="top: 120px; left: 75%; transform: rotate(-5deg);">
             <img src="tuyen3.jpg" alt="Tuyến">
             <span>2/8/2009</span>
         </div>
@@ -53,7 +53,7 @@
     <div class="overlay" id="overlay"></div>
 
     <script>
-        // 1. Khởi tạo Đồng hồ cuộn
+        // 1. SETUP ĐỒNG HỒ CUỘN TỪ NGÀY 25/7 ĐẾN 2/8
         const dates = [25, 26, 27, 28, 29, 30, 31, 1, 2];
         const dateList = document.getElementById('dateList');
         dates.forEach(d => {
@@ -63,78 +63,78 @@
             dateList.appendChild(div);
         });
 
-        // Bắt đầu chạy Animation sau khi trang load
+        // Hẹn giờ chạy hiệu ứng ngay sau khi web load lên
         setTimeout(() => {
             const itemHeight = document.querySelector('.date-item').offsetHeight;
             const targetScroll = -itemHeight * (dates.length - 1);
             
-            // Cuộn đến ngày 2 trong vòng 5 giây
+            // Cuộn mượt trong 5 giây
             dateList.style.transition = "top 5s cubic-bezier(0.25, 1, 0.5, 1)";
             dateList.style.top = targetScroll + 'px';
 
-            // Sau 5s (khi cuộn xong), làm sáng số 2 và bắn kim tuyến
+            // Sau khi cuộn xong (đúng 5 giây sau)
             setTimeout(() => {
                 const items = document.querySelectorAll('.date-item');
-                items[items.length - 1].classList.add('highlight');
+                items[items.length - 1].classList.add('highlight'); // Làm sáng số 2
                 
-                // Bắn kim tuyến
+                // Nổ kim tuyến ăn mừng
                 confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
 
-                // Sau 2s nữa, chuyển sang Giai đoạn Ma Trận
+                // Dừng lại 2 giây rồi chuyển cảnh sang Ma trận
                 setTimeout(startPhase2, 2000);
-            }, 5000); // Khớp với 5s cuộn
+            }, 5000); 
         }, 500);
 
-        // 2. Giai đoạn Ma trận & Đổi nền
+        // 2. CHUYỂN CẢNH MA TRẬN VÀ ĐỔI NỀN ĐEN TỪ TỪ
         function startPhase2() {
             document.getElementById('phase-1').classList.remove('active');
-            document.body.classList.add('black-bg'); // Đổi nền đen
+            document.body.classList.add('black-bg'); 
             
             const matrix = document.getElementById('matrixCanvas');
             matrix.style.opacity = 1;
-            initMatrix(); // Bắt đầu mưa ma trận
+            initMatrix(); // Bắn mưa chữ ma trận
 
-            // Sau 5s ma trận, hiện chữ HAPPY BIRTHDAY to
+            // Cơn mưa chữ chạy 5 giây rồi hiện chữ HAPPY BIRTHDAY to đùng
             setTimeout(startPhase3, 5000);
         }
 
-        // 3. Giai đoạn Chữ Chấm tròn
+        // 3. HIỆN CHỮ HAPPY BIRTHDAY CHẤM TRÒN
         function startPhase3() {
             const phase3 = document.getElementById('phase-3');
             phase3.classList.add('active');
 
-            // Sau 5s, mờ chữ đi và vẽ dây thừng
+            // Hiển thị chữ to 5 giây rồi mờ đi nhường chỗ cho dây ảnh
             setTimeout(() => {
                 phase3.classList.remove('active');
-                setTimeout(startPhase4, 1500); // Đợi chữ mờ hẳn rồi qua Phase 4
+                setTimeout(startPhase4, 1500); 
             }, 5000);
         }
 
-        // 4. Giai đoạn Dây ảnh
+        // 4. VẼ ĐƯỜNG CONG VÀ HIỆN ẢNH
         function startPhase4() {
-            // Mờ dần ma trận để làm nổi bật dây ảnh
+            // Mờ nền ma trận đi để nổi bật ảnh
             document.getElementById('matrixCanvas').style.opacity = 0.2; 
             document.getElementById('phase-4').classList.add('active');
 
-            // Hiện từng ảnh lên với hiệu ứng pop-up
+            // Cài đặt cho các ảnh nảy lên dần dần
             const photos = document.querySelectorAll('.polaroid');
             photos.forEach((photo, index) => {
                 setTimeout(() => {
                     const currentRotation = photo.style.transform.match(/rotate\((.*?)\)/)[0];
                     photo.style.transform = `scale(1) ${currentRotation}`;
-                }, 1500 + (index * 600)); // Vẽ dây xong mới hiện ảnh dần dần
+                }, 1500 + (index * 600)); 
             });
         }
 
-        /* MATRIX RAIN LOGIC */
+        // CÔNG THỨC MƯA CHỮ MA TRẬN (MATRIX)
         function initMatrix() {
             const canvas = document.getElementById('matrixCanvas');
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            // Các từ khóa theo yêu cầu
-            const words = ["HAPPPPBIRTHDAY", "KIM TUYEN CU TE", "NHKT", "FROM VCM WITH LOVE"];
+            // Đã đổi thành các chữ ông yêu cầu
+            const words = ["HAPPYBIRTHDAY", "NHKT", "VCM", "FROM VCM WITH LOVE", "KIMTUYEN"];
             const fontSize = 16;
             const columns = canvas.width / fontSize;
             const drops = [];
@@ -145,7 +145,7 @@
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                ctx.fillStyle = '#f472b6'; // Màu hồng
+                ctx.fillStyle = '#f472b6'; // Chữ ma trận màu hồng
                 ctx.font = fontSize + 'px monospace';
 
                 for(let i = 0; i < drops.length; i++) {
@@ -162,7 +162,7 @@
             setInterval(draw, 50);
         }
 
-        /* LOGIC PHÓNG TO ẢNH MƯỢT MÀ */
+        // TÍNH NĂNG NHẤP VÀO ẢNH ĐỂ PHÓNG TO MƯỢT MÀ
         const photos = document.querySelectorAll('.polaroid');
         const overlay = document.getElementById('overlay');
 
@@ -172,13 +172,14 @@
                     this.classList.remove('zoomed');
                     overlay.classList.remove('active');
                 } else {
-                    photos.forEach(p => p.classList.remove('zoomed')); // Tắt ảnh khác
+                    photos.forEach(p => p.classList.remove('zoomed')); 
                     this.classList.add('zoomed');
                     overlay.classList.add('active');
                 }
             });
         });
 
+        // Bấm ra nền đen để tắt ảnh phóng to
         overlay.addEventListener('click', () => {
             photos.forEach(p => p.classList.remove('zoomed'));
             overlay.classList.remove('active');
