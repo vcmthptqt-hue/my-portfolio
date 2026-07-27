@@ -12,11 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="rotate-message">
-        <div class="phone-icon">📱</div>
-        <h2>Vui lòng xoay ngang điện thoại!</h2>
-        <p>Để xem được trọn vẹn điều bất ngờ nha ✨</p>
-    </div>
 
     <div id="phase-1" class="phase active">
         <h2 class="question-text">Hôm nay là ngày gì thế nhỉ ????</h2>
@@ -28,7 +23,6 @@
         <p class="month-text" style="margin-top:10px;">Tháng 8</p>
     </div>
     
-
     <canvas id="matrixCanvas"></canvas>
 
     <div id="phase-3" class="phase">
@@ -42,15 +36,15 @@
             </svg>
         </div>
         
-        <div class="polaroid" style="top: 100px; left: 15%; transform: rotate(-10deg);">
+        <div class="polaroid" style="top: 15%; left: 15%; transform: rotate(-10deg);">
             <img src="tuyen1.jpg" alt="Tuyến">
             <span>Love Day 🌹</span>
         </div>
-        <div class="polaroid" style="top: 250px; left: 45%; transform: rotate(8deg);">
+        <div class="polaroid" style="top: 45%; left: 45%; transform: rotate(8deg);">
             <img src="tuyen2.jpg" alt="Tuyến">
             <span>Cu Te Nhất</span>
         </div>
-        <div class="polaroid" style="top: 120px; left: 75%; transform: rotate(-5deg);">
+        <div class="polaroid" style="top: 25%; left: 75%; transform: rotate(-5deg);">
             <img src="tuyen3.jpg" alt="Tuyến">
             <span>2/8/2009</span>
         </div>
@@ -59,7 +53,7 @@
     <div class="overlay" id="overlay"></div>
 
     <script>
-        // 1. SETUP ĐỒNG HỒ CUỘN TỪ NGÀY 25/7 ĐẾN 2/8
+        // 1. SETUP ĐỒNG HỒ CUỘN
         const dates = [25, 26, 27, 28, 29, 30, 31, 1, 2];
         const dateList = document.getElementById('dateList');
         dates.forEach(d => {
@@ -69,47 +63,40 @@
             dateList.appendChild(div);
         });
 
-        // Hẹn giờ chạy hiệu ứng ngay sau khi web load lên
         setTimeout(() => {
             const itemHeight = document.querySelector('.date-item').offsetHeight;
             const targetScroll = -itemHeight * (dates.length - 1);
             
-            // Cuộn mượt trong 5 giây
             dateList.style.transition = "top 5s cubic-bezier(0.25, 1, 0.5, 1)";
             dateList.style.top = targetScroll + 'px';
 
-            // Sau khi cuộn xong (đúng 5 giây sau)
             setTimeout(() => {
                 const items = document.querySelectorAll('.date-item');
-                items[items.length - 1].classList.add('highlight'); // Làm sáng số 2
+                items[items.length - 1].classList.add('highlight'); 
                 
-                // Nổ kim tuyến ăn mừng
                 confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
 
-                // Dừng lại 2 giây rồi chuyển cảnh sang Ma trận
                 setTimeout(startPhase2, 2000);
             }, 5000); 
         }, 500);
 
-        // 2. CHUYỂN CẢNH MA TRẬN VÀ ĐỔI NỀN ĐEN TỪ TỪ
+        // 2. CHUYỂN CẢNH MA TRẬN
         function startPhase2() {
             document.getElementById('phase-1').classList.remove('active');
             document.body.classList.add('black-bg'); 
             
             const matrix = document.getElementById('matrixCanvas');
             matrix.style.opacity = 1;
-            initMatrix(); // Bắn mưa chữ ma trận
+            initMatrix(); 
 
-            // Cơn mưa chữ chạy 5 giây rồi hiện chữ HAPPY BIRTHDAY to đùng
             setTimeout(startPhase3, 5000);
         }
 
-        // 3. HIỆN CHỮ HAPPY BIRTHDAY CHẤM TRÒN
+        // 3. HIỆN CHỮ HAPPY BIRTHDAY
         function startPhase3() {
             const phase3 = document.getElementById('phase-3');
             phase3.classList.add('active');
 
-            // Hiển thị chữ to 5 giây rồi mờ đi nhường chỗ cho dây ảnh
             setTimeout(() => {
                 phase3.classList.remove('active');
                 setTimeout(startPhase4, 1500); 
@@ -118,11 +105,9 @@
 
         // 4. VẼ ĐƯỜNG CONG VÀ HIỆN ẢNH
         function startPhase4() {
-            // Mờ nền ma trận đi để nổi bật ảnh
             document.getElementById('matrixCanvas').style.opacity = 0.2; 
             document.getElementById('phase-4').classList.add('active');
 
-            // Cài đặt cho các ảnh nảy lên dần dần
             const photos = document.querySelectorAll('.polaroid');
             photos.forEach((photo, index) => {
                 setTimeout(() => {
@@ -132,14 +117,15 @@
             });
         }
 
-        // CÔNG THỨC MƯA CHỮ MA TRẬN (MATRIX)
+        // SỬA LỖI 2: ĐO KÍCH THƯỚC CHUẨN ĐỂ MA TRẬN KHÔNG BỊ RƠI NGANG
         function initMatrix() {
             const canvas = document.getElementById('matrixCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            
+            // Lấy kích thước thực tế của phần tử Body (đã bị lật) thay vì của Window
+            canvas.width = document.body.clientWidth;
+            canvas.height = document.body.clientHeight;
 
-            // Đã đổi thành các chữ ông yêu cầu
             const words = ["HAPPYBIRTHDAY", "NHKT", "VCM", "FROM VCM WITH LOVE", "KIMTUYEN"];
             const fontSize = 16;
             const columns = canvas.width / fontSize;
@@ -151,7 +137,7 @@
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                ctx.fillStyle = '#f472b6'; // Chữ ma trận màu hồng
+                ctx.fillStyle = '#f472b6'; 
                 ctx.font = fontSize + 'px monospace';
 
                 for(let i = 0; i < drops.length; i++) {
@@ -166,9 +152,15 @@
                 }
             }
             setInterval(draw, 50);
+            
+            // Fix phòng trường hợp người dùng lật điện thoại sau khi load
+            window.addEventListener('resize', () => {
+                canvas.width = document.body.clientWidth;
+                canvas.height = document.body.clientHeight;
+            });
         }
 
-        // TÍNH NĂNG NHẤP VÀO ẢNH ĐỂ PHÓNG TO MƯỢT MÀ
+        // TÍNH NĂNG ZOOM ẢNH
         const photos = document.querySelectorAll('.polaroid');
         const overlay = document.getElementById('overlay');
 
@@ -185,7 +177,6 @@
             });
         });
 
-        // Bấm ra nền đen để tắt ảnh phóng to
         overlay.addEventListener('click', () => {
             photos.forEach(p => p.classList.remove('zoomed'));
             overlay.classList.remove('active');
