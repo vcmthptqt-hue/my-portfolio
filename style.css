@@ -3,6 +3,61 @@
     padding: 0; 
     box-sizing: border-box; 
 }
+/* ==========================================
+   BẮT BUỘC XOAY MÀN HÌNH SANG NGANG
+   ========================================== */
+
+/* Mặc định trên màn hình ngang hoặc PC: Ẩn thông báo này đi */
+#rotate-message {
+    display: none; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: #020617; /* Nền đen sâu */
+    color: white;
+    z-index: 99999; /* Đè lên tất cả mọi thứ */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+#rotate-message h2 {
+    font-size: 1.8rem;
+    margin: 20px 0 10px 0;
+    color: #f472b6; /* Màu hồng cho hợp tone */
+}
+
+#rotate-message p {
+    font-size: 1rem;
+    color: #cbd5e1;
+}
+
+/* Icon điện thoại tự động lắc/xoay để hướng dẫn */
+.phone-icon {
+    font-size: 4rem;
+    animation: rotatePhone 2s infinite ease-in-out;
+}
+
+@keyframes rotatePhone {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* LOGIC: Nếu thiết bị đang cầm dọc (Portrait) */
+@media screen and (orientation: portrait) {
+    /* 1. Hiện màn hình thông báo bắt xoay */
+    #rotate-message {
+        display: flex; 
+    }
+    
+    /* 2. Giấu nhẹm toàn bộ nội dung web đi để không bị lỗi hiển thị */
+    #phase-1, #matrixCanvas, #phase-3, #phase-4, .overlay {
+        display: none !important;
+    }
+}
 
 body, html {
     width: 100%; 
